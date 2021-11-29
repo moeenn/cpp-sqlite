@@ -1,8 +1,6 @@
-#include <iostream>
-#include <sqlite3.h>
-
 #include "database.hpp"
 #include "log.hpp"
+#include <iostream>
 
 // constructor
 Database::Database(const char *dbName) {

@@ -1,7 +1,7 @@
 #include "./database.hpp"
 #include <iostream>
 #include <sstream>
-#include <vector>
+#include <unordered_map>
 
 struct User {
   const int id;
@@ -24,8 +24,8 @@ void add_user(const Database &db, const User &u) {
   db.exec(query.str().c_str());
 }
 
-std::vector<User> get_users(const Database &db, const char *&query) {
-  const auto &results = db.fetch<User>(query);
+std::unordered_map<std::string, std::string> get_users(const Database &db, const char *&query) {
+  const auto &results = db.fetch(query);
   return results;
 }
 
@@ -34,17 +34,20 @@ int main() {
 
   create_users_table(db);
 
-  const User users[] = {{1, "Muhammad Moeen"}, {2, "Haseeb Raza"}};
+  const User users[] = {
+    {1, "Muhammad Moeen"}, 
+    {2, "Haseeb Raza"}
+  };
 
   for (const User &u : users) {
     add_user(db, u);
   }
 
   const char *query = "SELECT * FROM users;";
-  const std::vector<User> all_users = get_users(db, query);
+  const auto all_users = get_users(db, query);
 
-  for (const User &user : all_users) {
-    std::cout << user.id << " :: " << user.name << "\n";
+  for (const auto& user : all_users) {
+    std::cout << user.first << " :: " << user.second << "\n";
   }
 
   return 0;

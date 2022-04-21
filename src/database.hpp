@@ -1,10 +1,9 @@
-#ifndef DATABASE_H_
-#define DATABASE_H_
+#pragma once
 
 #include "log.hpp"
 #include <iostream>
 #include <sqlite3.h>
-#include <vector>
+#include <unordered_map>
 
 class Database {
 private:
@@ -17,8 +16,8 @@ public:
   void exec(const char *) const;
 
   // queries returning records
-  template <typename T> std::vector<T> fetch(const char *sql) const {
-    static std::vector<T> results;
+  std::unordered_map<std::string, std::string> fetch(const char *sql) const {
+    static std::unordered_map<std::string, std::string> results;
 
     /*
      * argc: Number of record returned
@@ -26,8 +25,13 @@ public:
      * azColName: name of the column
      */
     auto callback = [](void *NotUsed, int argc, char **argv, char **azColName) {
-      const T result{std::stoi(argv[0]), argv[1]};
-      results.push_back(result);
+
+      int i;
+      for (i = 0; i < argc; i++) { 
+        const auto pair = std::make_pair(azColName[i], argv[i]);
+        results.insert(pair);
+      }
+
       return 0;
     };
 
@@ -46,5 +50,3 @@ public:
     return results;
   }
 };
-
-#endif
